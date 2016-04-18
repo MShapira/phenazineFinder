@@ -1,19 +1,6 @@
 from peak import Peak
-from os import listdir
-from os.path import isfile
-from os.path import join as joinpath
+from numpy import genfromtxt
 
-mypath = 'PhenazineDatabase'
-for i in listdir(mypath):
-    if isfile(joinpath(mypath,i)):
-        from PhenazineDatabase import i as pdb
-        for phe in pdb:
-            if len(phe.lowEnergy) != len(phe.lowIntensity):
-                print(phe.name + 'low')
-            elif len(phe.midEnergy) != len(phe.midIntensity):
-                print(phe.name + 'mid')
-            elif len(phe.highEnergy) != len(phe.highIntensity):
-                print(phe.name + 'high')
 
 def parse_raw_line_to_components(raw_line):
     components = raw_line[:-1].replace('\t', ' ').split(' ')
@@ -58,6 +45,35 @@ with open(input('Enter the input file name: '), 'r+') as f:
                     peak.highIntensity.append(float(elements_high[1]))
             index += 1
             peaks.append(peak)
+
+
+def construct_substances_for_database(file_name):
+        file_data = genfromtxt(file_name, dtype=None, delimiter=' ', names=True)
+        peak = Peak()
+        peak.name = file_name
+
+        for line in file_data:
+            if len(line) == 0:
+                continue
+            if line[0].upper() == 'ENERGY0':
+                while line[0].upper() != 'ENERGY1':
+                    elements_low = parse_raw_line_to_components(file_name.readline())
+                    peak.lowMass.append(float(elements_low[0]))
+                    peak.lowIntensity.append(float(elements_low[1]))
+
+            if line[0].upper() == 'ENERGY1':
+                while line[0].upper() != 'ENERGY2':
+                    elements_mid = parse_raw_line_to_components(file_name.readline())
+                    peak.midMass.append(float(elements_mid[0]))
+                    peak.midIntensity.append(float(elements_mid[1]))
+
+            if line[0].upper() == 'ENERGY2':
+                while line[0].upper() != '':
+                    elements_high = parse_raw_line_to_components(file_name.readline())
+                    peak.highMass.append(float(elements_high[0]))
+                    peak.highIntensity.append(float(elements_high[1]))
+
+        return peak
 
 # print('peaks loaded: {0}'.format(index))
 # print()
