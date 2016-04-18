@@ -20,3 +20,6 @@ class Peak(object):
                'mid mass: {0}\n'.format(self.midMass) + \
                'mid intensity: {0}\n'.format(self.midIntensity) + \
                'high mass: {0}\n'.format(self.highMass) + 'high intensity: {0}'.format(self.highIntensity)
+
+    def __repr__(self):
+        return '\n{0}\n'.format(Peak.__str__(self))
