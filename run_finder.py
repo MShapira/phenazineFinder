@@ -53,7 +53,7 @@ def construct_peak_from_file(file_name):
         peak.name = file_name
 
         while True:
-            line = f.readline()
+            line = file.readline()
             if line == '':
                 break
 
