@@ -57,19 +57,19 @@ def construct_peak_from_file(file_name):
             if line == '':
                 break
 
-            if parse_raw_line_to_components(file.readline())[0].upper() == 'ENERGY0':
-                while parse_raw_line_to_components(file.readline())[0].upper() != 'ENERGY1':
+            if line[0].upper() == 'ENERGY0\n':
+                while parse_raw_line_to_components(file.readline())[0].upper() != 'ENERGY1\n':
                     elements_low = parse_raw_line_to_components(file.readline())
                     peak.lowMass.append(float(elements_low[0]))
                     peak.lowIntensity.append(float(elements_low[1]))
 
-            if parse_raw_line_to_components(file.readline())[0].upper() == 'ENERGY1':
-                while parse_raw_line_to_components(file.readline())[0].upper() != 'ENERGY2':
+            if line[0].upper() == 'ENERGY1\n':
+                while parse_raw_line_to_components(file.readline())[0].upper() != 'ENERGY2\n':
                     elements_mid = parse_raw_line_to_components(file.readline())
                     peak.midMass.append(float(elements_mid[0]))
                     peak.midIntensity.append(float(elements_mid[1]))
 
-            if parse_raw_line_to_components(file.readline())[0].upper() == 'ENERGY2':
+            if parse_raw_line_to_components(file.readline())[0].upper() == 'ENERGY2\n':
                 while parse_raw_line_to_components(file.readline())[0].upper() != '\n':
                     elements_high = parse_raw_line_to_components(file.readline())
                     peak.highMass.append(float(elements_high[0]))
