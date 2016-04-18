@@ -85,6 +85,13 @@ def construct_peak_from_file(file_name):
 
 
 if __name__ == '__main__':
+    from os import walk
+
+    file_names = []
+    for (dir_path, dir_names, additional_file_names) in walk('database'):
+        file_names.extend(additional_file_names)
+
     peaks = []
-    peaks.append(construct_peak_from_file('database/B4154'))
-    print(peaks)
+    for file_name in file_names:
+        peaks.append(construct_peak_from_file('database/{0}'.format(file_name)))
+        print(peaks)
