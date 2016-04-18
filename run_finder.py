@@ -47,29 +47,31 @@ with open(input('Enter the input file name: '), 'r+') as f:
             peaks.append(peak)
 
 
-def construct_substances_for_database(file_name):
-        file_data = genfromtxt(file_name, dtype=None, delimiter=' ', names=True)
+def construct_peak_from_file(file_name):
+        file = open(file_name, 'r+')
         peak = Peak()
         peak.name = file_name
 
-        for line in file_data:
-            if len(line) == 0:
-                continue
-            if line[0].upper() == 'ENERGY0':
-                while line[0].upper() != 'ENERGY1':
-                    elements_low = parse_raw_line_to_components(file_name.readline())
+        while True:
+            line = f.readline()
+            if line == '':
+                break
+
+            if file.readline()[0].upper() == 'ENERGY0':
+                while file.readline()[0].upper() != 'ENERGY1':
+                    elements_low = parse_raw_line_to_components(file.readline())
                     peak.lowMass.append(float(elements_low[0]))
                     peak.lowIntensity.append(float(elements_low[1]))
 
-            if line[0].upper() == 'ENERGY1':
-                while line[0].upper() != 'ENERGY2':
-                    elements_mid = parse_raw_line_to_components(file_name.readline())
+            if file.readline()[0].upper() == 'ENERGY1':
+                while file.readline()[0].upper() != 'ENERGY2':
+                    elements_mid = parse_raw_line_to_components(file.readline())
                     peak.midMass.append(float(elements_mid[0]))
                     peak.midIntensity.append(float(elements_mid[1]))
 
-            if line[0].upper() == 'ENERGY2':
-                while line[0].upper() != '':
-                    elements_high = parse_raw_line_to_components(file_name.readline())
+            if file.readline()[0].upper() == 'ENERGY2':
+                while file.readline()[0].upper() != '\n':
+                    elements_high = parse_raw_line_to_components(file.readline())
                     peak.highMass.append(float(elements_high[0]))
                     peak.highIntensity.append(float(elements_high[1]))
 
