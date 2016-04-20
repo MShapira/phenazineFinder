@@ -1,6 +1,7 @@
 from peak import Peak
 import math
 
+
 def parse_raw_line_to_components(raw_line):
     components = raw_line[:-1].replace('\t', ' ').split(' ')
     return [x for x in components if x != '']
@@ -99,43 +100,47 @@ def construct_peaks_from_folder(folder_name):
 
 def comparing_input_spectra_to_database(peaks, database, error):
     distances = []
-    for peak in peaks:
+    for experiment in peaks:
         current_distances = []
-        current_distance_low = []
-        current_distance_mid = []
-        current_distance_high = []
-        for i in range(len(peak.lowMass)):
-            for entity in database:
-                for j in range(len(entity.lowMass)):
-                    if float(abs(peak.lowMass[i] - entity.lowMass[j])) <= error:
-                        distance = math.sqrt((peak.lowMass[i] - entity.lowMass[j])**2 +
-                ((peak.lowIntensity[i]/math.fsum(peak.lowIntensity)*100) - entity.lowIntensity[j])**2)
-                        current_distance_low.append(distance)
-                        current_distances.append(current_distance_low)
-        for i in range(len(peak.midMass)):
-            for entity in database:
-                for j in range(len(entity.midMass)):
-                    if abs(peak.midMass[i] - entity.midMass[j]) <= error:
-                        distance = math.sqrt((peak.midMass[i] - entity.midMass[j])**2 +
-                                ((peak.midIntensity[i]/math.fsum(peak.midIntensity)*100) - entity.midIntensity[j])**2)
-                        current_distance_mid.append(distance)
-                        current_distances.append(current_distance_mid)
-        for i in range(len(peak.highMass)):
-            for entity in database:
-                for j in range(len(entity.highMass)):
-                    if abs(peak.highMass[i] - entity.highMass[j]) <= error:
-                        distance = math.sqrt((peak.highMass[i] - entity.highMass[j])**2 +
-                                ((peak.highIntensity[i]/math.fsum(peak.highIntensity)*100) - entity.highIntensity[j])**2)
-                        current_distance_high.append(distance)
-                        current_distances.append(current_distance_high)
+        for ethalon in database:
+            distance = []
+
+            # low
+            common_masses = 0
+            for ethalon_mass in ethalon.lowMass:
+                for experiment_mass in experiment.lowMass:
+                    if abs(experiment_mass - ethalon_mass)/ethalon_mass < error:
+                        common_masses += 1
+                        break
+            distance.append(common_masses / (len(experiment.lowMass) + len(ethalon.lowMass) - common_masses))
+
+            # middle
+            common_masses = 0
+            for ethalon_mass in ethalon.midMass:
+                for experiment_mass in experiment.midMass:
+                    if abs(experiment_mass - ethalon_mass)/ethalon_mass < error:
+                        common_masses += 1
+                        break
+            distance.append(common_masses / (len(experiment.midMass) + len(ethalon.midMass) - common_masses))
+            
+            # high
+            common_masses = 0
+            for ethalon_mass in ethalon.highMass:
+                for experiment_mass in experiment.highMass:
+                    if abs(experiment_mass - ethalon_mass)/ethalon_mass < error:
+                        common_masses += 1
+                        break
+            distance.append(common_masses / (len(experiment.highMass) + len(ethalon.highMass) - common_masses))
+            current_distances.append(distance)
         distances.append(current_distances)
     return distances
+
 
 if __name__ == '__main__':
     from os import walk
     folder_name = input('Please, enter folder name with database files: ')
     input_file = input('Enter the input file name: ')
-    error = float(input('Please, enter the Mass Tolerance in Da: '))
+    error = float(input('Please, enter the Mass Tolerance (relative): '))
 
     database = construct_peaks_from_folder(folder_name)
     peaks = construct_peaks_from_input(input_file)
@@ -143,4 +148,14 @@ if __name__ == '__main__':
 
     print(len(database))
     print(len(peaks))
-    print(len(distances))
+
+    for experiment_index in range(0, len(peaks)):
+        print('Peak name: {0}'.format(peaks[experiment_index].name))
+        print('Similarities:')
+        for ethalon_index in range(0, len(database)):
+            print('{0:>115}: {1:>7.3%} + {2:>7.3%} + {3:>7.3%} = {4:>7.3%}'.format(database[ethalon_index].name,
+                                                                                  distances[experiment_index][ethalon_index][0],
+                                                                                  distances[experiment_index][ethalon_index][1],
+                                                                                  distances[experiment_index][ethalon_index][2],
+                                                                                  math.fsum(distances[experiment_index][ethalon_index])))
+        print('-----------------------------------------------------------------------------------------')
