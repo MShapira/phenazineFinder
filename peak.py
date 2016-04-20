@@ -5,12 +5,15 @@ class Peak(object):
 
         self.lowMass = []
         self.lowIntensity = []
+        self.lowDistances = []
 
         self.midMass = []
         self.midIntensity = []
+        self.midDistances = []
 
         self.highMass = []
         self.highIntensity = []
+        self.highDistances = []
 
     def __str__(self):
         return 'name: {0}\n'.format(self.name) + \

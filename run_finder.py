@@ -1,5 +1,5 @@
 from peak import Peak
-
+import math
 
 def parse_raw_line_to_components(raw_line):
     components = raw_line[:-1].replace('\t', ' ').split(' ')
@@ -97,13 +97,39 @@ def construct_peaks_from_folder(folder_name):
     return database
 
 
+def comparing_input_spectra_to_database(peaks, database, error):
+    for peak in peaks:
+        for i in peak.lowMass:
+            for entity in database:
+                for j in entity.lowMass:
+                    if entity.lowMass[j] - error <= peak.lowMass[i] <= entity.lowMass[j] + error:
+                        distance = math.sqrt((peak.lowMass[i] - entity.lowMass[j])**2 +
+                ((peak.lowIntensity[i]/math.fsum(peak.lowIntensity)*100) - entity.lowIntensity[j])**2)
+                        entity.lowDistances.append(distance)
+        for i in peak.midMass:
+            for entity in database:
+                for j in entity.midMass:
+                    if entity.midMass[j] - error <= peak.midMass[i] <= entity.midMass[j] + error:
+                        distance = math.sqrt((peak.midMass[i] - entity.midMass[j])**2 +
+                                ((peak.midIntensity[i]/math.fsum(peak.midIntensity)*100) - entity.midIntensity[j])**2)
+                        entity.midDistances.append(distance)
+        for i in peak.highMass:
+            for entity in database:
+                for j in entity.highMass:
+                    if entity.highMass[j] - error <= peak.highMass[i] <= entity.highMass[j] + error:
+                        distance = math.sqrt((peak.highMass[i] - entity.highMass[j])**2 +
+                                ((peak.highIntensity[i]/math.fsum(peak.highIntensity)*100) - entity.hgihIntensity[j])**2)
+                        entity.highDistances.append(distance)
+
 if __name__ == '__main__':
     from os import walk
     folder_name = input('Please, enter folder name with database files: ')
     input_file = input('Enter the input file name: ')
+    error = float(input('Please, enter the Mass Tolerance in Da: '))
 
     database = construct_peaks_from_folder(folder_name)
     peaks = construct_peaks_from_input(input_file)
+    comparing_input_spectra_to_database(peaks, database, error)
 
     print(len(database))
     print(len(peaks))
