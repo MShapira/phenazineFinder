@@ -1,9 +1,5 @@
 from peak import Peak
 
-peaks = []
-database = []
-file_names = []
-
 
 def parse_raw_line_to_components(raw_line):
     components = raw_line[:-1].replace('\t', ' ').split(' ')
@@ -11,6 +7,7 @@ def parse_raw_line_to_components(raw_line):
 
 
 def construct_peaks_from_input(input):
+    peaks = []
     with open(input, 'r+') as f:
         index = 0
         while True:
@@ -48,6 +45,7 @@ def construct_peaks_from_input(input):
                         peak.highIntensity.append(float(elements_high[1]))
                 index += 1
                 peaks.append(peak)
+    return peaks
 
 
 def construct_peak_from_file(file_name):
@@ -88,10 +86,15 @@ def construct_peak_from_file(file_name):
 
 
 def construct_peaks_from_folder(folder_name):
+    database = []
+    file_names = []
     for (dir_path, dir_names, additional_file_names) in walk(folder_name):
         file_names.extend(additional_file_names)
-        for file_name in file_names:
-            database.append(construct_peak_from_file(folder_name + '/{0}'.format(file_name)))
+
+    for file_name in file_names:
+        database.append(construct_peak_from_file(folder_name + '/{0}'.format(file_name)))
+
+    return database
 
 
 if __name__ == '__main__':
@@ -99,17 +102,8 @@ if __name__ == '__main__':
     folder_name = input('Please, enter folder name with database files: ')
     input_file = input('Enter the input file name: ')
 
-    construct_peaks_from_folder(folder_name)
+    database = construct_peaks_from_folder(folder_name)
+    peaks = construct_peaks_from_input(input_file)
 
-    construct_peaks_from_input(input_file)
-
-print(len(database))
-print(len(peaks))
-
-# for phenazine in len(database):
-#     if len(database[phenazine].lowMass) != len(database[phenazine].lowIntensity):
-#         print(database[phenazine].name + 'low')
-#     elif len(database[phenazine].midMass) != len(database[phenazine].midIntensity):
-#         print(database[phenazine].name + 'mid')
-#     elif len(database[phenazine].highMass) != len(database[phenazine].highIntensity):
-#         print(database[phenazine].name + 'high')
+    print(len(database))
+    print(len(peaks))
