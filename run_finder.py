@@ -98,28 +98,38 @@ def construct_peaks_from_folder(folder_name):
 
 
 def comparing_input_spectra_to_database(peaks, database, error):
+    distances = []
     for peak in peaks:
+        current_distances = []
+        current_distance_low = []
+        current_distance_mid = []
+        current_distance_high = []
         for i in range(len(peak.lowMass)):
             for entity in database:
                 for j in range(len(entity.lowMass)):
                     if float(abs(peak.lowMass[i] - entity.lowMass[j])) <= error:
                         distance = math.sqrt((peak.lowMass[i] - entity.lowMass[j])**2 +
                 ((peak.lowIntensity[i]/math.fsum(peak.lowIntensity)*100) - entity.lowIntensity[j])**2)
-                        entity.lowDistances.append(distance)
+                        current_distance_low.append(distance)
+                        current_distances.append(current_distance_low)
         for i in range(len(peak.midMass)):
             for entity in database:
                 for j in range(len(entity.midMass)):
                     if abs(peak.midMass[i] - entity.midMass[j]) <= error:
                         distance = math.sqrt((peak.midMass[i] - entity.midMass[j])**2 +
                                 ((peak.midIntensity[i]/math.fsum(peak.midIntensity)*100) - entity.midIntensity[j])**2)
-                        entity.midDistances.append(distance)
+                        current_distance_mid.append(distance)
+                        current_distances.append(current_distance_mid)
         for i in range(len(peak.highMass)):
             for entity in database:
                 for j in range(len(entity.highMass)):
                     if abs(peak.highMass[i] - entity.highMass[j]) <= error:
                         distance = math.sqrt((peak.highMass[i] - entity.highMass[j])**2 +
                                 ((peak.highIntensity[i]/math.fsum(peak.highIntensity)*100) - entity.highIntensity[j])**2)
-                        entity.highDistances.append(distance)
+                        current_distance_high.append(distance)
+                        current_distances.append(current_distance_high)
+        distances.append(current_distances)
+    return distances
 
 if __name__ == '__main__':
     from os import walk
@@ -129,7 +139,8 @@ if __name__ == '__main__':
 
     database = construct_peaks_from_folder(folder_name)
     peaks = construct_peaks_from_input(input_file)
-    comparing_input_spectra_to_database(peaks, database, error)
+    distances = comparing_input_spectra_to_database(peaks, database, error)
 
     print(len(database))
     print(len(peaks))
+    print(len(distances))
