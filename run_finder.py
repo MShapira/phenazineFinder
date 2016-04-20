@@ -90,7 +90,8 @@ def construct_peak_from_file(file_name):
 def construct_peaks_from_folder(folder_name):
     for (dir_path, dir_names, additional_file_names) in walk(folder_name):
         file_names.extend(additional_file_names)
-    return file_names
+        for file_name in file_names:
+            database.append(construct_peak_from_file(folder_name + '/{0}'.format(file_name)))
 
 
 if __name__ == '__main__':
@@ -98,8 +99,7 @@ if __name__ == '__main__':
     folder_name = input('Please, enter folder name with database files: ')
     input_file = input('Enter the input file name: ')
 
-    for file_name in construct_peaks_from_folder(folder_name):
-        database.append(construct_peak_from_file(folder_name + '/{0}'.format(file_name)))
+    construct_peaks_from_folder(folder_name)
 
     construct_peaks_from_input(input_file)
 
