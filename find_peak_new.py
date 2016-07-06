@@ -65,6 +65,7 @@ def construct_complete_data_file(input, database, error):
         if line_array[0] == 'True':
             if 180 < float(line_array[6]) < 650 and float(line_array[12]) != 0:
                 for compound in database:
+                    # print (compound.name)
                     if abs(float(line_array[6]) - compound.lowMass[len(compound.lowMass) - 1]) <= error/1000000 * compound.lowMass[len(compound.lowMass) - 1]:
                         new_input.append(compound.name)
                         new_input.append(';')
